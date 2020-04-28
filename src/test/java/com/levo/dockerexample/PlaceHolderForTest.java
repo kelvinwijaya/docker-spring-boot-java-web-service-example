@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -14,8 +16,10 @@ import org.apache.http.client.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
@@ -41,15 +45,19 @@ public class PlaceHolderForTest {
 	@Test
 	public void whenSendGetRequestUsingHttpClient_thenCorrect() 
 	  throws ClientProtocolException, IOException {
-	    CloseableHttpClient client = HttpClients.createDefault();
+//	    CloseableHttpClient client = HttpClients.createDefault();
 		
-//		HttpClientBuilder clientbuilder = HttpClients.custom();
-//	    CloseableHttpClient client = clientbuilder.build();
-	    
+		
+		
+		CloseableHttpClient client = null;
 	    CloseableHttpResponse response = null;
 	    String strResp = null;
 	    
 	    try {
+	    	HttpClientBuilder clientbuilder = HttpClientBuilder.create();
+	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
+			clientbuilder.setSSLContext(sslContext);
+		    client = clientbuilder.build();
 	    	
 	    	HttpHost proxyHost = new HttpHost("18.141.10.185", 80, "http");
 			

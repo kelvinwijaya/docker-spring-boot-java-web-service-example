@@ -1,10 +1,9 @@
 package com.levo.dockerexample.controller;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -14,10 +13,11 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,27 +30,30 @@ import com.google.common.io.ByteSource;
 public class CftClientController {
 	
 	@RequestMapping(value = "/sherlock", method = RequestMethod.GET)
-	public String callSherlock() throws IOException {
+	public String callSherlock() {
 		
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
-				   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
 		
-		//Creating the HttpClientBuilder
-		HttpClientBuilder clientbuilder = HttpClients.custom();
-		clientbuilder = clientbuilder.setDefaultCredentialsProvider(credsProvider);
-
-		CloseableHttpClient client = clientbuilder.build();
-		
-		HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "http");
-		
-		RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
-		reqconfigconbuilder = reqconfigconbuilder.setProxy(proxyHost);
-		RequestConfig requestConfig = reqconfigconbuilder.build();
-		
+		CloseableHttpClient client = null;
 				
 		try{
 			
+			
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
+					   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+			
+			//Creating the HttpClientBuilder
+			HttpClientBuilder clientbuilder = HttpClientBuilder.create();
+	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
+			clientbuilder.setSSLContext(sslContext);
+
+			client = clientbuilder.build();
+			
+			HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "http");
+			
+			RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
+			reqconfigconbuilder = reqconfigconbuilder.setProxy(proxyHost);
+			RequestConfig requestConfig = reqconfigconbuilder.build();
 			
 		    HttpGet httpGet = new HttpGet(System.getenv("SHERLOCK_URL"));
 		    
@@ -78,15 +81,14 @@ public class CftClientController {
 		        response.close();
 		    }
 		    
-		    assertTrue(response.getStatusLine().getStatusCode()==200);
-		    
-			
 			return strResp;
 		}catch(Exception e){
 			return "Exception:" + e.getMessage();
 		}finally{
 			try {
-				client.close();
+				if(null!=client){
+					client.close();
+				}
 			} catch (IOException ioe) {
 				return "IOException" + ioe.getMessage();
 			}
