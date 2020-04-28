@@ -45,9 +45,9 @@ public class CftClientController {
 		try{
 			
 			//Creating the HttpClientBuilder
-//			HttpClientBuilder clientbuilder = HttpClientBuilder.create();
-//	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
-//			clientbuilder.setSSLContext(sslContext);
+			HttpClientBuilder clientbuilder = HttpClientBuilder.create();
+	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
+			clientbuilder.setSSLContext(sslContext);
 //			
 //			Collection<Header> defaultHeaders = new ArrayList<Header>();
 //			String userAndPass = System.getenv("PROXY_USER") + ":" + System.getenv("PROXY_PASSWORD");
@@ -65,7 +65,7 @@ public class CftClientController {
 //			clientbuilder.setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(defaultHeaders);
 			
 			
-//			client = clientbuilder.build();
+			client = clientbuilder.build();
 			
 			HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "http");
 			
