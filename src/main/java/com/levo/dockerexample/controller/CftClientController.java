@@ -2,14 +2,16 @@ package com.levo.dockerexample.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -17,12 +19,14 @@ import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteSource;
 
 @RestController
@@ -42,10 +46,15 @@ public class CftClientController {
 	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
 			clientbuilder.setSSLContext(sslContext);
 			
-			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			Collection<Header> defaultHeaders = new ArrayList<Header>();
+			String userAndPass = System.getenv("PROXY_USER") + ":" + System.getenv("PROXY_PASSWORD");
+			Header header = new BasicHeader("Authorization","Basic " + BaseEncoding.base64().encode(userAndPass.getBytes("UTF-8")));
+			defaultHeaders.add(header);
+			
+			BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 			credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
 					   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
-			clientbuilder.setDefaultCredentialsProvider(credsProvider);
+			clientbuilder.setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(defaultHeaders);
 			
 			
 			client = clientbuilder.build();
