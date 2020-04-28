@@ -5,6 +5,8 @@ FROM openjdk:8-jre-alpine
 # source: https://stackoverflow.com/a/40944512/3128926
 RUN apk update && apk add bash
 
+RUN apk --no-cache add curl
+
 # Set the working directory to /app
 WORKDIR /app
 
