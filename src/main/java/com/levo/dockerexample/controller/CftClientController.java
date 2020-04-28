@@ -45,25 +45,27 @@ public class CftClientController {
 		try{
 			
 			//Creating the HttpClientBuilder
-			HttpClientBuilder clientbuilder = HttpClientBuilder.create();
-	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
-			clientbuilder.setSSLContext(sslContext);
+//			HttpClientBuilder clientbuilder = HttpClientBuilder.create();
+//	    	SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustAllStrategy()).build();
+//			clientbuilder.setSSLContext(sslContext);
+//			
+//			Collection<Header> defaultHeaders = new ArrayList<Header>();
+//			String userAndPass = System.getenv("PROXY_USER") + ":" + System.getenv("PROXY_PASSWORD");
+//			Header header = new BasicHeader("Authorization","Basic " + BaseEncoding.base64().encode(userAndPass.getBytes("UTF-8")));
+//			defaultHeaders.add(header);
+//			
+//			BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 			
-			Collection<Header> defaultHeaders = new ArrayList<Header>();
-			String userAndPass = System.getenv("PROXY_USER") + ":" + System.getenv("PROXY_PASSWORD");
-			Header header = new BasicHeader("Authorization","Basic " + BaseEncoding.base64().encode(userAndPass.getBytes("UTF-8")));
-			defaultHeaders.add(header);
 			
-			BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 //			credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
 //					   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
 			
-			credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+//			credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+//			
+//			clientbuilder.setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(defaultHeaders);
 			
-			clientbuilder.setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(defaultHeaders);
 			
-			
-			client = clientbuilder.build();
+//			client = clientbuilder.build();
 			
 			HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "http");
 			
@@ -74,18 +76,20 @@ public class CftClientController {
 		    HttpGet httpGet = new HttpGet(System.getenv("SHERLOCK_URL"));
 		    
 		    httpGet.setConfig(requestConfig);
-		    String strResp = null;
-		    HttpClientContext context = HttpClientContext.create();
-		    context.setCredentialsProvider(credsProvider);
+//		    String strResp = null;
+//		    HttpClientContext context = HttpClientContext.create();
+//		    context.setCredentialsProvider(credsProvider);
 //		    response = client.execute(httpGet, context);
 		    
 		    
 //		    String result = StringUtils.EMPTY;
 		    try(CloseableHttpResponse response = client.execute(httpGet)) {
 //		        CookieManager.touch(response);
-		        strResp = EntityUtils.toString(response.getEntity());
-		    } catch (IOException e) {
-		        System.out.println(e);
+		        String strResp = EntityUtils.toString(response.getEntity());
+		        System.out.println("strResp:" + strResp);
+		        return "Return(inside):" + strResp;
+		    } finally {
+		    	httpGet.releaseConnection();
 		    }
 		    
 		    
@@ -105,7 +109,7 @@ public class CftClientController {
 //	            
 //	        }
 		    
-			return "Return:" + strResp;
+//			return "Return:" + strResp;
 		}catch(Exception e){
 			System.out.println(e);
 			return "Exception:" + e.getMessage();
