@@ -15,6 +15,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -52,8 +53,11 @@ public class CftClientController {
 			defaultHeaders.add(header);
 			
 			BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
-					   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+//			credsProvider.setCredentials(new AuthScope(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT"))), new
+//					   UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+			
+			credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(System.getenv("PROXY_USER"), System.getenv("PROXY_PASSWORD")));
+			
 			clientbuilder.setDefaultCredentialsProvider(credsProvider).setDefaultHeaders(defaultHeaders);
 			
 			
@@ -69,8 +73,9 @@ public class CftClientController {
 		    
 		    httpGet.setConfig(requestConfig);
 		    String strResp = null;
-		 
-		    CloseableHttpResponse response = client.execute(httpGet);
+		    HttpClientContext context = HttpClientContext.create();
+		    context.setCredentialsProvider(credsProvider);
+		    CloseableHttpResponse response = client.execute(httpGet, context);
 		    
 		    
 	        HttpEntity entity = response.getEntity();
