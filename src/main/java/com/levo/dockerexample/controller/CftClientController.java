@@ -62,27 +62,26 @@ public class CftClientController {
 		 
 		    CloseableHttpResponse response = client.execute(httpGet);
 		    
-		    try {
-		        HttpEntity entity = response.getEntity();
-		        if (entity != null) {
-		        	InputStream instream = entity.getContent();
-		        	
-		        	ByteSource byteSource = new ByteSource() {
-		                @Override
-		                public InputStream openStream() throws IOException {
-		                    return instream;
-		                }
-		            };
-		            
-		            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
-		            instream.close();
-		        }
-		    } finally {
-		        response.close();
-		    }
 		    
-			return strResp;
+	        HttpEntity entity = response.getEntity();
+	        if (entity != null) {
+	        	InputStream instream = entity.getContent();
+	        	
+	        	ByteSource byteSource = new ByteSource() {
+	                @Override
+	                public InputStream openStream() throws IOException {
+	                    return instream;
+	                }
+	            };
+	            
+	            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
+	            instream.close();
+	            response.close();
+	        }
+		    
+			return "Return:" + strResp;
 		}catch(Exception e){
+			e.printStackTrace();
 			return "Exception:" + e.getMessage();
 		}finally{
 			try {
@@ -90,6 +89,7 @@ public class CftClientController {
 					client.close();
 				}
 			} catch (IOException ioe) {
+				ioe.printStackTrace();
 				return "IOException" + ioe.getMessage();
 			}
 		}
