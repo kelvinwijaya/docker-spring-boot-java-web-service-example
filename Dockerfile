@@ -17,4 +17,4 @@ COPY /target/docker-java-app-example.jar /app
 EXPOSE 8080
 
 # Run jar file when the container launches
-ENTRYPOINT ["java", "-jar", "docker-java-app-example.jar"]
+CMD ["java", "-jar", "docker-java-app-example.jar"]

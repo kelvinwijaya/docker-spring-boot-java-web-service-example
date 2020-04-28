@@ -22,6 +22,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +41,7 @@ public class CftClientController {
 		
 		
 		CloseableHttpClient client = null;
-		CloseableHttpResponse response =  null;		
+//		CloseableHttpResponse response =  null;		
 		try{
 			
 			//Creating the HttpClientBuilder
@@ -75,42 +77,53 @@ public class CftClientController {
 		    String strResp = null;
 		    HttpClientContext context = HttpClientContext.create();
 		    context.setCredentialsProvider(credsProvider);
-		    response = client.execute(httpGet, context);
+//		    response = client.execute(httpGet, context);
 		    
 		    
-	        HttpEntity entity = response.getEntity();
-	        if (entity != null) {
-	        	InputStream instream = entity.getContent();
-	        	
-	        	ByteSource byteSource = new ByteSource() {
-	                @Override
-	                public InputStream openStream() throws IOException {
-	                    return instream;
-	                }
-	            };
-	            
-	            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
-	            instream.close();
-	            
-	        }
+//		    String result = StringUtils.EMPTY;
+		    try(CloseableHttpResponse response = client.execute(httpGet)) {
+//		        CookieManager.touch(response);
+		        strResp = EntityUtils.toString(response.getEntity());
+		    } catch (IOException e) {
+		        System.out.println(e);
+		    }
+		    
+		    
+//	        HttpEntity entity = response.getEntity();
+//	        if (entity != null) {
+//	        	InputStream instream = entity.getContent();
+//	        	
+//	        	ByteSource byteSource = new ByteSource() {
+//	                @Override
+//	                public InputStream openStream() throws IOException {
+//	                    return instream;
+//	                }
+//	            };
+//	            
+//	            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
+//	            instream.close();
+//	            
+//	        }
 		    
 			return "Return:" + strResp;
 		}catch(Exception e){
-			e.printStackTrace();
+			System.out.println(e);
 			return "Exception:" + e.getMessage();
-		}finally{
-			try {
-				if(null!=response){
-					response.close();
-				}
-				if(null!=client){
-					client.close();
-				}
-			} catch (IOException ioe) {
-				ioe.printStackTrace();
-				return "IOException" + ioe.getMessage();
-			}
 		}
+		
+//		finally{
+//			try {
+//				if(null!=response){
+//					response.close();
+//				}
+//				if(null!=client){
+//					client.close();
+//				}
+//			} catch (IOException ioe) {
+//				ioe.printStackTrace();
+//				return "IOException" + ioe.getMessage();
+//			}
+//		}
 		
 	}
 	
