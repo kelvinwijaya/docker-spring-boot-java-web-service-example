@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.*;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
@@ -40,12 +42,27 @@ public class PlaceHolderForTest {
 	public void whenSendGetRequestUsingHttpClient_thenCorrect() 
 	  throws ClientProtocolException, IOException {
 	    CloseableHttpClient client = HttpClients.createDefault();
-	    HttpGet httpGet = new HttpGet("https://sherlock-heroku.herokuapp.com/api/helloworld");
+		
+//		HttpClientBuilder clientbuilder = HttpClients.custom();
+//	    CloseableHttpClient client = clientbuilder.build();
+	    
+	    CloseableHttpResponse response = null;
 	    String strResp = null;
-	 
-	    CloseableHttpResponse response = client.execute(httpGet);
 	    
 	    try {
+	    	
+	    	HttpHost proxyHost = new HttpHost("18.141.10.185", 80, "http");
+			
+			RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
+			reqconfigconbuilder = reqconfigconbuilder.setProxy(proxyHost);
+			RequestConfig requestConfig = reqconfigconbuilder.build();
+		    
+		    HttpGet httpGet = new HttpGet("https://sherlock-heroku.herokuapp.com/api/helloworld");
+		    httpGet.setConfig(requestConfig);
+		   
+		 
+		    response = client.execute(httpGet);
+	    	
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {
 	        	InputStream instream = entity.getContent();
@@ -59,12 +76,21 @@ public class PlaceHolderForTest {
 	            
 	            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
 	            instream.close();
+	            response.close();
+	    		System.out.println("strResp:" + strResp);
+	    		assertTrue(response.getStatusLine().getStatusCode()==200);
 	        }
-	    } finally {
-	        response.close();
+	    }catch (Exception e){ 
+	    	e.printStackTrace();
 	    }
-	    System.out.println("strResp:" + strResp);
-	    assertTrue(response.getStatusLine().getStatusCode()==200);
-	    client.close();
+	    finally {
+	    	try{
+		    	client.close();
+		    }catch(IOException ioe) {
+		    	ioe.printStackTrace();
+		    }
+		    
+	    }
+	    
 	}
 }

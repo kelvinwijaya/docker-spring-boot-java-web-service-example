@@ -42,7 +42,7 @@ public class CftClientController {
 
 		CloseableHttpClient client = clientbuilder.build();
 		
-		HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "https");
+		HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "http");
 		
 		RequestConfig.Builder reqconfigconbuilder= RequestConfig.custom();
 		reqconfigconbuilder = reqconfigconbuilder.setProxy(proxyHost);
