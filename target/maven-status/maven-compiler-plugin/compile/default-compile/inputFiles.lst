@@ -1,2 +1,3 @@
 /Users/kelvinwijaya/Github/docker-spring-boot-java-web-service-example/src/main/java/com/levo/dockerexample/controller/HelloController.java
 /Users/kelvinwijaya/Github/docker-spring-boot-java-web-service-example/src/main/java/com/levo/dockerexample/DockerApp.java
+/Users/kelvinwijaya/Github/docker-spring-boot-java-web-service-example/src/main/java/com/levo/dockerexample/controller/CftClientController.java
