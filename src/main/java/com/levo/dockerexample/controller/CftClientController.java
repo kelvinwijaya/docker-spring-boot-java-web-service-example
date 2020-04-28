@@ -40,7 +40,7 @@ public class CftClientController {
 		HttpClientBuilder clientbuilder = HttpClients.custom();
 		clientbuilder = clientbuilder.setDefaultCredentialsProvider(credsProvider);
 
-		CloseableHttpClient client = HttpClients.createDefault();
+		CloseableHttpClient client = clientbuilder.build();
 		
 		HttpHost proxyHost = new HttpHost(System.getenv("PROXY_HOST"), Integer.valueOf(System.getenv("PROXY_PORT")), "https");
 		
