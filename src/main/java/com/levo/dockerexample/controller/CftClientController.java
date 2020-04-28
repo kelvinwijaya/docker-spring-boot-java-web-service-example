@@ -39,7 +39,7 @@ public class CftClientController {
 		
 		
 		CloseableHttpClient client = null;
-				
+		CloseableHttpResponse response =  null;		
 		try{
 			
 			//Creating the HttpClientBuilder
@@ -75,7 +75,7 @@ public class CftClientController {
 		    String strResp = null;
 		    HttpClientContext context = HttpClientContext.create();
 		    context.setCredentialsProvider(credsProvider);
-		    CloseableHttpResponse response = client.execute(httpGet, context);
+		    response = client.execute(httpGet, context);
 		    
 		    
 	        HttpEntity entity = response.getEntity();
@@ -91,7 +91,7 @@ public class CftClientController {
 	            
 	            strResp = byteSource.asCharSource(Charsets.UTF_8).read();
 	            instream.close();
-	            response.close();
+	            
 	        }
 		    
 			return "Return:" + strResp;
@@ -100,6 +100,9 @@ public class CftClientController {
 			return "Exception:" + e.getMessage();
 		}finally{
 			try {
+				if(null!=response){
+					response.close();
+				}
 				if(null!=client){
 					client.close();
 				}
